@@ -1,0 +1,10 @@
+database:
+  driver:
+  host:
+  database:
+  username:
+  password:
+  port:
+  charset:
+  collation:
+  prefix:
