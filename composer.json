@@ -2,11 +2,33 @@
     "name": "dominic/openpress.local",
     "description": "My own clone of WordPress",
     "type": "project",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "Dominic Carrington",
             "email": "carringtondominic@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "wikimedia/composer-merge-plugin": "^1.4"
+    },
+    "extra": {
+        "merge-plugin": {
+            "include": [
+                "app/plugins/*/composer.json"
+            ],
+            "recurse": true,
+            "replace": false,
+            "ignore-duplicates": false,
+            "merge-dev": true,
+            "merge-extra": false,
+            "merge-extra-deep": false,
+            "merge-scripts": false
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "OpenPress\\": "src/"
+        }
+    }
 }
