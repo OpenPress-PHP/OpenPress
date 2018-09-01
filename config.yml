@@ -1,0 +1,10 @@
+database:
+  driver: mysql
+  host: 127.0.0.1
+  database: openpress
+  username: root
+  password: root
+  port: 33060
+  charset: utf8
+  collation: utf8_unicode_ci
+  prefix:
