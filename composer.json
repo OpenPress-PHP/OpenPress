@@ -1,0 +1,12 @@
+{
+    "name": "dominic/openpress.local",
+    "description": "My own clone of WordPress",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Dominic Carrington",
+            "email": "carringtondominic@gmail.com"
+        }
+    ],
+    "require": {}
+}
