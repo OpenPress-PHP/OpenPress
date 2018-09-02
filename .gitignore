@@ -57,3 +57,9 @@ Temporary Items
 # End of https://www.gitignore.io/api/git,macos,vagrant,composer,visualstudiocode
 
 config.yml
+
+app/plugins/*
+!app/plugins/.gitkeep
+
+app/themes/*
+!app/themes/.gitkeep
