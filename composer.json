@@ -9,8 +9,14 @@
             "email": "carringtondominic@gmail.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/dominiccarrington/OpenPress-ComposerMerge"
+        }
+    ],
     "require": {
-        "wikimedia/composer-merge-plugin": "^1.4",
+        "openpress/composer-merge": "dev-master",
         "illuminate/database": "^5.6",
         "robmorgan/phinx": "^0.10.6",
         "symfony/finder": "^4.1",
