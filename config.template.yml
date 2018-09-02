@@ -1,6 +1,9 @@
+debug: false
+cache: false
+
 database:
-  driver:
-  host:
+  driver: mysql
+  host: 127.0.0.1
   database:
   username:
   password:

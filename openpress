@@ -4,7 +4,7 @@ use OpenPress\Config\Configuration;
 use Phinx\Console\Command as Phinx;
 use Symfony\Component\Console\Application;
 
-require_once __DIR__ . "/boot/common.php";
+require_once __DIR__ . "/boot/bootstrap.php";
 
 $app = new Application();
 

@@ -9,7 +9,7 @@ class Configuration
 
     private static $config = [];
 
-    public static function get($key, $default = null)
+    public static function get($key = "", $default = null)
     {
         self::boot();
 
