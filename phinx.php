@@ -8,7 +8,7 @@ try {
 } catch (InvalidArgumentException $e) {
     $finder = [];
 }
-$migrations = ["%%PHINX_CONFIG_DIR%%/db/migrations"];
+$migrations = ["%%PHINX_CONFIG_DIR%%/app/db/migrations"];
 foreach ($finder as $directory) {
     $migrations[] = $directory->getPathName();
 }
@@ -18,7 +18,7 @@ try {
 } catch (InvalidArgumentException $e) {
     $finder = [];
 }
-$seeds = ["%%PHINX_CONFIG_DIR%%/db/seeds"];
+$seeds = ["%%PHINX_CONFIG_DIR%%/app/db/seeds"];
 foreach ($finder as $directory) {
     $seeds[] = $directory->getPathName();
 }
