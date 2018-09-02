@@ -10,9 +10,22 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 class Application extends App
 {
+    public static $instance = null;
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            throw new RuntimeException("You cannot access the App instance before it has been instantiated");
+        }
+
+        return self::$instance;
+    }
+
     public function __construct()
     {
         parent::__construct();
+
+        static::$instance = $this;
     }
 
     protected function configureContainer(ContainerBuilder $builder)

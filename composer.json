@@ -22,7 +22,8 @@
         "symfony/finder": "^4.1",
         "slim/slim": "^3.0",
         "php-di/slim-bridge": "^2.0",
-        "slim/twig-view": "^2.4"
+        "slim/twig-view": "^2.4",
+        "symfony/filesystem": "^4.1"
     },
     "extra": {
         "merge-plugin": {

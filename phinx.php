@@ -1,32 +1,15 @@
 <?php
+use OpenPress\Plugin\Loader;
+use Composer\Console\Application;
 use OpenPress\Config\Configuration;
-use Symfony\Component\Finder\Finder;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
-try {
-    $finder = (new Finder())->directories()->in(__DIR__ . "/app/plugins/*/db")->name("migrations");
-} catch (InvalidArgumentException $e) {
-    $finder = [];
-}
-$migrations = ["%%PHINX_CONFIG_DIR%%/app/db/migrations"];
-foreach ($finder as $directory) {
-    $migrations[] = $directory->getPathName();
-}
-
-try {
-    $finder = (new Finder())->directories()->in(__DIR__ . "/app/plugins/*/db")->name("seeds");
-} catch (InvalidArgumentException $e) {
-    $finder = [];
-}
-$seeds = ["%%PHINX_CONFIG_DIR%%/app/db/seeds"];
-foreach ($finder as $directory) {
-    $seeds[] = $directory->getPathName();
-}
+$loader = (Application::getInstance())->getContainer()->get(Loader::class);
 
 return [
     'paths' => [
-        'migrations' => $migrations,
-        'seeds' => $seeds
+        'migrations' => $loader->getMigrationDirectories(),
+        'seeds' => $loader->getSeedDirectories()
     ],
     'environments' => [
         'default_migration_table' => 'phinxlog',
