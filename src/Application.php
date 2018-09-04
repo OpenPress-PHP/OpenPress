@@ -3,10 +3,12 @@ namespace OpenPress;
 
 use DI\Bridge\Slim\App;
 use DI\ContainerBuilder;
+use OpenPress\Http\Route;
 use OpenPress\Plugin\Loader;
 use OpenPress\Config\Configuration;
 use Psr\Container\ContainerInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Application extends App
 {
@@ -26,6 +28,10 @@ class Application extends App
         parent::__construct();
 
         static::$instance = $this;
+
+        $this->getContainer()->get(Loader::class)->loadPlugins();
+
+        Route::setApplication($this);
     }
 
     protected function configureContainer(ContainerBuilder $builder)
@@ -46,7 +52,10 @@ class Application extends App
 
             // DI Injections
             Loader::class => function (ContainerInterface $c) {
-                return new Loader();
+                return new Loader($this);
+            },
+            EventDispatcher::class => function (ContainerInterface $c) {
+                return new EventDispatcher();
             },
             \Slim\Views\Twig::class => function (ContainerInterface $c) {
                 $cache = Configuration::get("cache", false);

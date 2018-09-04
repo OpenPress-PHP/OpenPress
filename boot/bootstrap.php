@@ -1,9 +1,19 @@
 <?php
+use OpenPress\Http\Route;
 use OpenPress\Application;
-use OpenPress\Config\Configuration;
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
 $app = new Application();
 
+/**
+ * Setup Eloquent Database
+ */
 $app->getContainer()->get("database");
+
+/**
+ * Define routes
+ */
+Route::register();
+
+return $app;

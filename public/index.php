@@ -1,9 +1,8 @@
 <?php
 
 use OpenPress\Application;
-require_once "../boot/bootstrap.php";
 
-$app = new Application();
+$app = require_once __DIR__ . "/../boot/bootstrap.php";
 
 // Boot the application
 $app->run();

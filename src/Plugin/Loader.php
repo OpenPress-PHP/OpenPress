@@ -1,28 +1,40 @@
 <?php
 namespace OpenPress\Plugin;
 
+use OpenPress\Application;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Filesystem;
 
 class Loader
 {
     private $plugins = [];
+    private $loaded;
 
-    public function __construct()
+    public function __construct(Application $app)
     {
         $finder = (new Finder())->files()->in(__DIR__ . "/../../app/plugins/*")->name("composer.json");
         foreach ($finder as $file) {
             $plugin = json_decode(file_get_contents($file->getPathName()), true);
-            $enabled = isset($plugin['extra']['openpress']['enabled']) ? $plugin['extra']['openpress']['enabled'] : false;
+            $enabled = $plugin['extra']['openpress']['enabled'] ?? false;
             unset($plugin['extra']['openpress']['enabled']);
+            $baseClass = $plugin['extra']['openpress']['class'] ?? null;
+            unset($plugin['extra']['openpress']['class']);
 
             $location = dirname(realpath($file->getPathName()));
 
-            if (!isset($plugin['name'])) {
-                throw new InvalidPluginException($location, "Missing name.");
+            if ($baseClass === null) {
+                throw new InvalidPluginException($location, "Missing plugin class");
             }
 
-            $this->plugins[$plugin['name']] = [
+            if (!in_array(Plugin::class, class_parents($baseClass))) {
+                throw new InvalidPluginException($location, "Plugin class must extend " . Plugin::class);
+            }
+
+            if (!isset($plugin['name'])) {
+                throw new InvalidPluginException($location, "Missing name");
+            }
+
+            $data = [
                 "name" => $plugin['name'],
                 "version" => $plugin['version'] ?? "1.0.0",
                 "description" => $plugin['description'] ?? "",
@@ -31,6 +43,16 @@ class Loader
                 "enabled" => $enabled,
                 "extra" => $plugin['extra']['openpress'] ?? []
             ];
+
+            $this->plugins[$plugin['name']] = new $baseClass($app, $data);
+        }
+    }
+
+    public function loadPlugins()
+    {
+        $this->loaded = true;
+        foreach ($this->plugins as $name => $plugin) {
+            $plugin->load();
         }
     }
 
@@ -42,7 +64,7 @@ class Loader
     public function getEnabledPlugins()
     {
         return array_filter($this->plugins, function ($plugin) {
-            return $plugin["enabled"];
+            return $plugin->isEnabled();
         });
     }
 
@@ -66,7 +88,7 @@ class Loader
         $directories = [];
         $filesystem = new Filesystem();
         foreach ($this->getEnabledPlugins() as $plugin) {
-            $directory = $plugin["location"] . "/" . ($plugin["extra"][$extraKey] ?? $folder);
+            $directory = $plugin->getLocation() . "/" . ($plugin->getExtraPluginInformation()[$extraKey] ?? $folder);
             if ($filesystem->exists($directory)) {
                 $directories[] = $directory;
             }
