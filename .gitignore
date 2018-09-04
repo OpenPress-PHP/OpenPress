@@ -52,6 +52,7 @@ Temporary Items
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+*.code-workspace
 
 
 # End of https://www.gitignore.io/api/git,macos,vagrant,composer,visualstudiocode
