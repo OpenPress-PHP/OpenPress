@@ -3,5 +3,5 @@ namespace OpenPress\Event;
 
 class EventDictionary
 {
-    const ROUTE_PRE = "route.pre";
+    const ROUTE_EVENT = "route";
 }

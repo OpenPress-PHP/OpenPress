@@ -22,7 +22,7 @@ class Route
     public static function register()
     {
         $dispatcher = static::$app->getContainer()->get(EventDispatcher::class);
-        $dispatcher->dispatch(EventDictionary::ROUTE_PRE);
+        $dispatcher->dispatch(EventDictionary::ROUTE);
     }
 
     /**
