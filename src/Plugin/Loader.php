@@ -44,7 +44,7 @@ class Loader
                 "extra" => $plugin['extra']['openpress'] ?? []
             ];
 
-            $this->plugins[$plugin['name']] = new $baseClass($app, $data);
+            $this->plugins[$plugin['name']] = new $baseClass($app->getContainer(), $data);
         }
     }
 
