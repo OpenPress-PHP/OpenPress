@@ -3,7 +3,6 @@ namespace OpenPress;
 
 use DI\Bridge\Slim\App;
 use DI\ContainerBuilder;
-use OpenPress\Http\Route;
 use OpenPress\Plugin\Loader;
 use OpenPress\Config\Configuration;
 use Psr\Container\ContainerInterface;
@@ -28,10 +27,6 @@ class Application extends App
         parent::__construct();
 
         static::$instance = $this;
-
-        $this->getContainer()->get(Loader::class)->loadPlugins();
-
-        Route::setApplication($this);
     }
 
     protected function configureContainer(ContainerBuilder $builder)
@@ -76,7 +71,9 @@ class Application extends App
                 return $twig;
             },
         ];
-
         $builder->addDefinitions($definitions);
+
+        $loader = new Loader($this);
+        $loader->createContainer($builder);
     }
 }

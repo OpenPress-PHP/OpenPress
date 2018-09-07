@@ -12,8 +12,14 @@ $app = new Application();
 $app->getContainer()->get("database");
 
 /**
+ * Load enabled plugins
+ */
+$app->getContainer()->get(Loader::class)->loadPlugins();
+
+/**
  * Define routes
  */
+Route::setApplication($app);
 Route::register();
 
 return $app;

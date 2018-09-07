@@ -1,40 +1,45 @@
 <?php
 namespace OpenPress\Plugin;
 
+use DI\ContainerBuilder;
 use OpenPress\Application;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Filesystem;
 
 class Loader
 {
-    private $plugins = [];
-    private $loaded;
+    private $app;
+    private static $plugins = [];
+    private static $loaded;
 
     public function __construct(Application $app)
     {
-        $finder = (new Finder())->files()->in(__DIR__ . "/../../app/plugins/*")->name("composer.json");
-        foreach ($finder as $file) {
-            $plugin = json_decode(file_get_contents($file->getPathName()), true);
-            $enabled = $plugin['extra']['openpress']['enabled'] ?? false;
-            unset($plugin['extra']['openpress']['enabled']);
-            $baseClass = $plugin['extra']['openpress']['class'] ?? null;
-            unset($plugin['extra']['openpress']['class']);
+        $this->app = $app;
 
-            $location = dirname(realpath($file->getPathName()));
+        if (empty(static::$plugins)) {
+            $finder = (new Finder())->files()->in(__DIR__ . "/../../app/plugins/*")->name("composer.json");
+            foreach ($finder as $file) {
+                $plugin = json_decode(file_get_contents($file->getPathName()), true);
+                $enabled = $plugin['extra']['openpress']['enabled'] ?? false;
+                unset($plugin['extra']['openpress']['enabled']);
+                $baseClass = $plugin['extra']['openpress']['class'] ?? null;
+                unset($plugin['extra']['openpress']['class']);
 
-            if ($baseClass === null) {
-                throw new InvalidPluginException($location, "Missing plugin class");
-            }
+                $location = dirname(realpath($file->getPathName()));
 
-            if (!in_array(Plugin::class, class_parents($baseClass))) {
-                throw new InvalidPluginException($location, "Plugin class must extend " . Plugin::class);
-            }
+                if ($baseClass === null) {
+                    throw new InvalidPluginException($location, "Missing plugin class");
+                }
 
-            if (!isset($plugin['name'])) {
-                throw new InvalidPluginException($location, "Missing name");
-            }
+                if (!in_array(Plugin::class, class_parents($baseClass))) {
+                    throw new InvalidPluginException($location, "Plugin class must extend " . Plugin::class);
+                }
 
-            $data = [
+                if (!isset($plugin['name'])) {
+                    throw new InvalidPluginException($location, "Missing name");
+                }
+
+                $data = [
                 "name" => $plugin['name'],
                 "version" => $plugin['version'] ?? "1.0.0",
                 "description" => $plugin['description'] ?? "",
@@ -44,26 +49,35 @@ class Loader
                 "extra" => $plugin['extra']['openpress'] ?? []
             ];
 
-            $this->plugins[$plugin['name']] = new $baseClass($app->getContainer(), $data);
+                static::$plugins[$plugin['name']] = new $baseClass($data);
+            }
+        }
+    }
+
+    public function createContainer(ContainerBuilder $builder)
+    {
+        foreach ($this->getEnabledPlugins() as $name => $plugin) {
+            $plugin->createContainer($builder);
         }
     }
 
     public function loadPlugins()
     {
-        $this->loaded = true;
-        foreach ($this->plugins as $name => $plugin) {
+        static::$loaded = true;
+        foreach ($this->getEnabledPlugins() as $name => $plugin) {
+            $plugin->setContainer($this->app->getContainer());
             $plugin->load();
         }
     }
 
     public function getAllPlugins()
     {
-        return $this->plugins;
+        return static::$plugins;
     }
 
     public function getEnabledPlugins()
     {
-        return array_filter($this->plugins, function ($plugin) {
+        return array_filter(static::$plugins, function ($plugin) {
             return $plugin->isEnabled();
         });
     }

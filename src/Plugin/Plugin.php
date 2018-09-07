@@ -2,6 +2,7 @@
 namespace OpenPress\Plugin;
 
 use RuntimeException;
+use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 
 abstract class Plugin
@@ -17,10 +18,8 @@ abstract class Plugin
     private $enabled = null;
     private $extra = null;
 
-    public function __construct(ContainerInterface $container, array $data)
+    public function __construct(array $data)
     {
-        $this->container = $container;
-
         $this->setData("name", $data['name']);
         $this->setData("version", $data['version'] ?? "1.0.0");
         $this->setData("description", $data['description'] ?? "");
@@ -30,7 +29,20 @@ abstract class Plugin
         $this->setData("extra", $data['extra']['openpress'] ?? []);
     }
 
+    public function createContainer(ContainerBuilder $builder)
+    {
+        // NO-OP
+    }
+
     abstract public function load();
+
+    public function setContainer(ContainerInterface $container)
+    {
+        if ($this->container !== null) {
+            throw new RuntimeException("Cannot redefine container");
+        }
+        $this->container = $container;
+    }
 
     private function setData($key, $value)
     {
