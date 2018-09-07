@@ -2,11 +2,11 @@
 namespace OpenPress\Plugin;
 
 use RuntimeException;
-use OpenPress\Application;
+use Psr\Container\ContainerInterface;
 
 abstract class Plugin
 {
-    protected $app;
+    protected $container;
 
     /* Attributes are read only */
     private $name = null;
@@ -17,9 +17,9 @@ abstract class Plugin
     private $enabled = null;
     private $extra = null;
 
-    public function __construct(Application $app, array $data)
+    public function __construct(ContainerInterface $container, array $data)
     {
-        $this->app = $app;
+        $this->container = $container;
 
         $this->setData("name", $data['name']);
         $this->setData("version", $data['version'] ?? "1.0.0");
