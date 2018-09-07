@@ -89,4 +89,24 @@ abstract class Plugin
     {
         return $this->extra;
     }
+
+    public function getViewsDirectory()
+    {
+        return $this->getDirectory("views", "resources/views");
+    }
+
+    public function getMigrationsDirectory()
+    {
+        return $this->getDirectory("migrations", "resources/migrations");
+    }
+
+    public function getSeedsDirectory()
+    {
+        return $this->getDirectory("seeds", "resources/seeds");
+    }
+
+    private function getDirectory($key, $folder)
+    {
+        return $this->getLocation() . "/" . ($this->getExtraPluginInformation()[$key] ?? $folder);
+    }
 }

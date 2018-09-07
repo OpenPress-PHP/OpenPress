@@ -84,25 +84,25 @@ class Loader
 
     public function getViewDirectories()
     {
-        return $this->getDirectoriesFromEnabledPlugins("views", "resources/views");
+        return $this->getDirectoriesFromEnabledPlugins("Views");
     }
 
     public function getMigrationDirectories()
     {
-        return $this->getDirectoriesFromEnabledPlugins("migrations", "resources/migrations");
+        return $this->getDirectoriesFromEnabledPlugins("Migrations");
     }
 
     public function getSeedDirectories()
     {
-        return $this->getDirectoriesFromEnabledPlugins("seeds", "resources/seeds");
+        return $this->getDirectoriesFromEnabledPlugins("Seeds");
     }
 
-    private function getDirectoriesFromEnabledPlugins($extraKey, $folder)
+    private function getDirectoriesFromEnabledPlugins($key)
     {
         $directories = [];
         $filesystem = new Filesystem();
         foreach ($this->getEnabledPlugins() as $plugin) {
-            $directory = $plugin->getLocation() . "/" . ($plugin->getExtraPluginInformation()[$extraKey] ?? $folder);
+            $directory = call_user_func([$plugin, "get{$key}Directory"]);
             if ($filesystem->exists($directory)) {
                 $directories[] = $directory;
             }

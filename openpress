@@ -3,18 +3,19 @@
 use OpenPress\Config\Configuration;
 use Phinx\Console\Command as Phinx;
 use Symfony\Component\Console\Application;
+use OpenPress\Console\Command\CreateMigrationCommand;
 
-require_once __DIR__ . "/boot/bootstrap.php";
+$app = require_once __DIR__ . "/boot/bootstrap.php";
 
-$app = new Application();
+$console = new Application();
 
-$app->add((new Phinx\Breakpoint())->setName("db:breakpoint"));
-$app->add((new Phinx\Create())->setName("db:create"));
-$app->add((new Phinx\Migrate())->setName("db:migrate"));
-$app->add((new Phinx\Rollback())->setName("db:rollback"));
-$app->add((new Phinx\Status())->setName("db:status"));
+$console->add((new Phinx\Breakpoint())->setName("db:breakpoint"));
+$console->add((new CreateMigrationCommand($app))->setName("db:create"));
+$console->add((new Phinx\Migrate())->setName("db:migrate"));
+$console->add((new Phinx\Rollback())->setName("db:rollback"));
+$console->add((new Phinx\Status())->setName("db:status"));
 
-$app->add((new Phinx\SeedCreate())->setName("seed:create"));
-$app->add((new Phinx\SeedRun())->setName("seed:run"));
+$console->add((new CreateSeedCommand($app))->setName("seed:create"));
+$console->add((new Phinx\SeedRun())->setName("seed:run"));
 
-$app->run();
+$console->run();
