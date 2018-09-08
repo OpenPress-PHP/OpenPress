@@ -1,6 +1,7 @@
 <?php
 namespace OpenPress\Content;
 
+use RuntimeException;
 use DI\ContainerBuilder;
 use OpenPress\Application;
 use Symfony\Component\Finder\Finder;
@@ -19,7 +20,7 @@ class Loader
         $this->app = $app;
 
         if (empty(static::$plugins)) {
-            $finder = (new Finder())->files()->in(__DIR__ . "/../../app/plugins/*")->name("composer.json");
+            $finder = (new Finder())->files()->in(__DIR__ . "/../../app/plugins/*/*")->name("composer.json");
             foreach ($finder as $file) {
                 $plugin = json_decode(file_get_contents($file->getPathName()), true);
 
@@ -72,7 +73,7 @@ class Loader
         }
 
         if (empty(static::$themes)) {
-            $finder = (new Finder())->files()->in(__DIR__ . "/../../app/themes/*")->name("composer.json");
+            $finder = (new Finder())->files()->in(__DIR__ . "/../../app/themes/*/*")->name("composer.json");
             foreach ($finder as $file) {
                 $theme = json_decode(file_get_contents($file->getPathName()), true);
                 $enabled = $theme['extra']['openpress']['enabled'] ?? false;

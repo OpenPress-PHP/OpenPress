@@ -33,7 +33,7 @@
     "extra": {
         "merge-plugin": {
             "include": [
-                "app/plugins/*/composer.json"
+                "app/plugins/*/*/composer.json"
             ],
             "recurse": true,
             "replace": false,
