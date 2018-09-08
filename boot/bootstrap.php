@@ -3,6 +3,8 @@ use OpenPress\Http\Route;
 use OpenPress\Application;
 use OpenPress\Content\Loader;
 
+session_start();
+
 require_once __DIR__ . "/../vendor/autoload.php";
 
 $app = new Application();

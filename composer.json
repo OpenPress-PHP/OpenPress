@@ -25,7 +25,10 @@
         "slim/twig-view": "^2.4",
         "symfony/filesystem": "^4.1",
         "symfony/event-dispatcher": "^4.1",
-        "symfony/var-dumper": "^4.1"
+        "symfony/var-dumper": "^4.1",
+        "respect/validation": "^1.1",
+        "slim/csrf": "^0.8.3",
+        "slim/flash": "^0.4.0"
     },
     "extra": {
         "merge-plugin": {

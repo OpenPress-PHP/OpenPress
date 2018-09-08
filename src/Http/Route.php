@@ -3,6 +3,7 @@ namespace OpenPress\Http;
 
 use RuntimeException;
 use OpenPress\Application;
+use Slim\Csrf\Guard as Csrf;
 use OpenPress\Event\EventDictionary;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -46,9 +47,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function post($pattern, $callable)
+    public static function post($pattern, $callable, $csrf = true)
     {
-        return static::map(['POST'], $pattern, $callable);
+        return static::map(['POST'], $pattern, $callable, $csrf);
     }
 
     /**
@@ -59,9 +60,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function put($pattern, $callable)
+    public static function put($pattern, $callable, $csrf = true)
     {
-        return static::map(['PUT'], $pattern, $callable);
+        return static::map(['PUT'], $pattern, $callable, $csrf);
     }
 
     /**
@@ -72,9 +73,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function patch($pattern, $callable)
+    public static function patch($pattern, $callable, $csrf = true)
     {
-        return static::map(['PATCH'], $pattern, $callable);
+        return static::map(['PATCH'], $pattern, $callable, $csrf);
     }
 
     /**
@@ -85,9 +86,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function delete($pattern, $callable)
+    public static function delete($pattern, $callable, $csrf = true)
     {
-        return static::map(['DELETE'], $pattern, $callable);
+        return static::map(['DELETE'], $pattern, $callable, $csrf);
     }
 
     /**
@@ -98,9 +99,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function options($pattern, $callable)
+    public static function options($pattern, $callable, $csrf = true)
     {
-        return static::map(['OPTIONS'], $pattern, $callable);
+        return static::map(['OPTIONS'], $pattern, $callable, $csrf);
     }
 
     /**
@@ -111,9 +112,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function any($pattern, $callable)
+    public static function any($pattern, $callable, $csrf = true)
     {
-        return static::map(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], $pattern, $callable);
+        return static::map(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], $pattern, $callable, $csrf);
     }
 
     /**
@@ -125,9 +126,9 @@ class Route
      *
      * @return RouteInterface
      */
-    public static function map(array $methods, $pattern, $callable)
+    public static function map(array $methods, $pattern, $callable, $csrf = true)
     {
-        return static::$app->map($methods, $pattern, $callable);
+        return static::$app->map($methods, $pattern, $callable)->add(static::$app->getContainer()->get(Csrf::class));
     }
 
     /**

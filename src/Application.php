@@ -3,7 +3,9 @@ namespace OpenPress;
 
 use DI\Bridge\Slim\App;
 use DI\ContainerBuilder;
+use Slim\Csrf\Guard as Csrf;
 use OpenPress\Content\Loader;
+use Slim\Flash\Messages as Flash;
 use OpenPress\Config\Configuration;
 use Psr\Container\ContainerInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -69,6 +71,12 @@ class Application extends App
                 ));
 
                 return $twig;
+            },
+            Csrf::class => function (ContainerInterface $c) {
+                return new Csrf();
+            },
+            Flash::class => function (ContainerInterface $c) {
+                return new Flash();
             },
         ];
         $builder->addDefinitions($definitions);
