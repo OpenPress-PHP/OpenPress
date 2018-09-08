@@ -34,6 +34,10 @@ class Loader
 
                 $location = dirname(realpath($file->getPathName()));
 
+                if (!$enabled) {
+                    $baseClass = DisabledPlugin::class;
+                }
+
                 if ($baseClass === null) {
                     throw new InvalidPluginException($location, "Missing plugin class");
                 }
