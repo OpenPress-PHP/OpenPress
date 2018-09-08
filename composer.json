@@ -24,7 +24,8 @@
         "php-di/slim-bridge": "^2.0",
         "slim/twig-view": "^2.4",
         "symfony/filesystem": "^4.1",
-        "symfony/event-dispatcher": "^4.1"
+        "symfony/event-dispatcher": "^4.1",
+        "symfony/var-dumper": "^4.1"
     },
     "extra": {
         "merge-plugin": {
