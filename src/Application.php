@@ -3,7 +3,7 @@ namespace OpenPress;
 
 use DI\Bridge\Slim\App;
 use DI\ContainerBuilder;
-use OpenPress\Plugin\Loader;
+use OpenPress\Content\Loader;
 use OpenPress\Config\Configuration;
 use Psr\Container\ContainerInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;

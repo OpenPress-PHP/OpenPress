@@ -1,5 +1,5 @@
 <?php
-namespace OpenPress\Plugin;
+namespace OpenPress\Content;
 
 use InvalidArgumentException;
 

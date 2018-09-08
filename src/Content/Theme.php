@@ -1,11 +1,9 @@
 <?php
-namespace OpenPress\Plugin;
+namespace OpenPress\Content;
 
 use RuntimeException;
-use DI\ContainerBuilder;
-use Psr\Container\ContainerInterface;
 
-abstract class Plugin
+class Theme
 {
     protected $container;
 
@@ -27,21 +25,6 @@ abstract class Plugin
         $this->setData("location", $data['location']);
         $this->setData("enabled", $data['enabled']);
         $this->setData("extra", $data['extra']['openpress'] ?? []);
-    }
-
-    public function createContainer(ContainerBuilder $builder)
-    {
-        // NO-OP
-    }
-
-    abstract public function load();
-
-    public function setContainer(ContainerInterface $container)
-    {
-        if ($this->container !== null) {
-            throw new RuntimeException("Cannot redefine container");
-        }
-        $this->container = $container;
     }
 
     private function setData($key, $value)
@@ -85,7 +68,7 @@ abstract class Plugin
         return $this->enabled;
     }
 
-    public function getExtraPluginInformation()
+    public function getExtraThemeInformation()
     {
         return $this->extra;
     }
@@ -95,18 +78,8 @@ abstract class Plugin
         return $this->getDirectory("views", "resources/views");
     }
 
-    public function getMigrationsDirectory()
-    {
-        return $this->getDirectory("migrations", "resources/migrations");
-    }
-
-    public function getSeedsDirectory()
-    {
-        return $this->getDirectory("seeds", "resources/seeds");
-    }
-
     private function getDirectory($key, $folder)
     {
-        return $this->getLocation() . "/" . ($this->getExtraPluginInformation()[$key] ?? $folder);
+        return $this->getLocation() . "/" . ($this->getExtraThemeInformation()[$key] ?? $folder);
     }
 }

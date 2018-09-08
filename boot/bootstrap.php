@@ -1,7 +1,7 @@
 <?php
 use OpenPress\Http\Route;
 use OpenPress\Application;
-use OpenPress\Plugin\Loader;
+use OpenPress\Content\Loader;
 
 require_once __DIR__ . "/../vendor/autoload.php";
 

@@ -2,7 +2,7 @@
 namespace OpenPress\Console\Command;
 
 use OpenPress\Application;
-use OpenPress\Plugin\Loader;
+use OpenPress\Content\Loader;
 use Phinx\Console\Command\SeedCreate;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;

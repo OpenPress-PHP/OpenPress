@@ -1,6 +1,6 @@
 <?php
 use OpenPress\Application;
-use OpenPress\Plugin\Loader;
+use OpenPress\Content\Loader;
 use OpenPress\Config\Configuration;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
