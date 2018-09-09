@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class Route
 {
     private static $app = null;
+    private static $group = null;
 
     public static function setApplication(Application $app)
     {
@@ -17,7 +18,7 @@ class Route
             throw new RuntimeException("Application has already been defined");
         }
 
-        static::$app = $app;
+        static::$app = static::$group = $app;
     }
 
     public static function register()
@@ -128,7 +129,7 @@ class Route
      */
     public static function map(array $methods, $pattern, $callable, $csrf = true)
     {
-        return static::$app->map($methods, $pattern, $callable)->add(static::$app->getContainer()->get(Csrf::class));
+        return static::$group->map($methods, $pattern, $callable)->add(static::$app->getContainer()->get(Csrf::class));
     }
 
     /**
@@ -163,6 +164,16 @@ class Route
      */
     public static function group($pattern, $callable)
     {
-        return static::$app->group($pattern, $callable);
+        /** @var RouteGroup $group */
+        $group = static::$app->getContainer()->get('router')->pushGroup($pattern, $callable);
+        $group->setContainer(static::$app->getContainer());
+
+        $nestedGroup = static::$group;
+        $group(static::$app);
+        static::$group = $nestedGroup;
+
+        static::$app->getContainer()->get('router')->popGroup();
+        return $group;
+        // return static::$app->group($pattern, $callable);
     }
 }
