@@ -110,9 +110,11 @@ class Loader
     public function loadPlugins()
     {
         static::$loaded = true;
-        foreach ($this->getEnabledPlugins() as $name => $plugin) {
-            $plugin->setContainer($this->app->getContainer());
-            $plugin->load();
+        foreach (static::$pluginsByPriority as $priority => $plugins) {
+            foreach ($plugins as $plugin) {
+                $plugin->setContainer($this->app->getContainer());
+                $plugin->load();
+            }
         }
     }
 
