@@ -35,8 +35,10 @@ class CreateSeedCommand extends SeedCreate
             $path = __DIR__ . "/../../../app/db/seeds";
         } elseif (in_array($plugin, array_keys($enabledPlugins))) {
             $path = $enabledPlugins[$plugin]->getSeedsDirectory();
+        } else {
+            $output->writeln("Plugin '{$plugin}' not found");
+            exit();
         }
-        $path = realpath($path);
 
         $fileSystem = new Filesystem();
         if (!$fileSystem->exists($path)) {

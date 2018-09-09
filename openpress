@@ -3,6 +3,7 @@
 use OpenPress\Config\Configuration;
 use Phinx\Console\Command as Phinx;
 use Symfony\Component\Console\Application;
+use OpenPress\Console\Command\CreateSeedCommand;
 use OpenPress\Console\Command\CreateMigrationCommand;
 
 $app = require_once __DIR__ . "/boot/bootstrap.php";
