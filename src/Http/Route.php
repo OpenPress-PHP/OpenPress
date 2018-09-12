@@ -1,10 +1,11 @@
 <?php
 namespace OpenPress\Http;
 
+use ReflectionClass;
 use RuntimeException;
 use OpenPress\Application;
-use Slim\Csrf\Guard as Csrf;
 use OpenPress\Event\EventDictionary;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Route
@@ -48,9 +49,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function post($pattern, $callable, $csrf = true)
+    public static function post($pattern, $callable)
     {
-        return static::map(['POST'], $pattern, $callable, $csrf);
+        return static::map(['POST'], $pattern, $callable);
     }
 
     /**
@@ -61,9 +62,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function put($pattern, $callable, $csrf = true)
+    public static function put($pattern, $callable)
     {
-        return static::map(['PUT'], $pattern, $callable, $csrf);
+        return static::map(['PUT'], $pattern, $callable);
     }
 
     /**
@@ -74,9 +75,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function patch($pattern, $callable, $csrf = true)
+    public static function patch($pattern, $callable)
     {
-        return static::map(['PATCH'], $pattern, $callable, $csrf);
+        return static::map(['PATCH'], $pattern, $callable);
     }
 
     /**
@@ -87,9 +88,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function delete($pattern, $callable, $csrf = true)
+    public static function delete($pattern, $callable)
     {
-        return static::map(['DELETE'], $pattern, $callable, $csrf);
+        return static::map(['DELETE'], $pattern, $callable);
     }
 
     /**
@@ -100,9 +101,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function options($pattern, $callable, $csrf = true)
+    public static function options($pattern, $callable)
     {
-        return static::map(['OPTIONS'], $pattern, $callable, $csrf);
+        return static::map(['OPTIONS'], $pattern, $callable);
     }
 
     /**
@@ -113,9 +114,9 @@ class Route
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public static function any($pattern, $callable, $csrf = true)
+    public static function any($pattern, $callable)
     {
-        return static::map(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], $pattern, $callable, $csrf);
+        return static::map(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], $pattern, $callable);
     }
 
     /**
@@ -127,9 +128,9 @@ class Route
      *
      * @return RouteInterface
      */
-    public static function map(array $methods, $pattern, $callable, $csrf = true)
+    public static function map(array $methods, $pattern, $callable)
     {
-        return static::$group->map($methods, $pattern, $callable)->add(static::$app->getContainer()->get(Csrf::class));
+        return static::$group->map($methods, $pattern, $callable);
     }
 
     /**
@@ -174,6 +175,58 @@ class Route
 
         static::$app->getContainer()->get('router')->popGroup();
         return $group;
-        // return static::$app->group($pattern, $callable);
+    }
+
+    public static function controller(string $class)
+    {
+        if (!in_array(BaseController::class, class_parents($class))) {
+            throw new RuntimeException("{$class} must extend " . BaseController::class);
+        }
+
+        $reader = new AnnotationReader();
+        $reflectionClass = new ReflectionClass($class);
+        $properties = $reflectionClass->getMethods();
+
+        $groupDefined = false;
+
+        $classAnnos = $reader->getClassAnnotations($reflectionClass);
+        foreach ($classAnnos as $anno) {
+            if (get_class($anno) === \OpenPress\Annotation\RouteGroup::class) {
+                $group = static::$app->getContainer()->get('router')->pushGroup($anno->group, function ($group) {
+                });
+                $group->setContainer(static::$app->getContainer());
+
+                $nestedGroup = static::$group;
+                $groupDefined;
+            }
+
+            if ($groupDefined && get_class($anno) === \OpenPress\Annotation\Middleware::class) {
+                static::$group->add(static::$app->getContainer()->get($anno->object));
+            }
+        }
+
+        foreach ($properties as $property) {
+            $methodAnnos = $reader->getMethodAnnotations($property);
+            $routes = [];
+            foreach ($methodAnnos as $anno) {
+                if (get_class($anno) === \OpenPress\Annotation\Route::class) {
+                    $route = call_user_func_array([static::class, strtolower($anno->method)], [$anno->uri, [$class, $property->getName()]]);
+                    if ($anno->name !== null) {
+                        $route->setName($anno->name);
+                    }
+
+                    $routes[] = $route;
+                } elseif (get_class($anno) === \OpenPress\Annotation\Middleware::class) {
+                    foreach ($routes as $route) {
+                        $route->add(static::$app->getContainer()->get($anno->object));
+                    }
+                }
+            }
+        }
+
+        if ($groupDefined) {
+            static::$group = $nestedGroup;
+            static::$app->getContainer()->get('router')->popGroup();
+        }
     }
 }

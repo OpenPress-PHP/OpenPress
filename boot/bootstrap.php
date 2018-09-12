@@ -3,11 +3,17 @@ use OpenPress\Http\Route;
 use OpenPress\Application;
 use OpenPress\Content\Loader;
 use OpenPress\Http\AssetsController;
+use Symfony\Component\Finder\Finder;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 
 session_start();
 
 require_once __DIR__ . "/../vendor/autoload.php";
 define("ROOT_DIR", realpath(__DIR__ . "/.."));
+
+foreach ((new Finder())->files()->in(ROOT_DIR . "/src/Annotation/")->name("*.php")->contains("@Annotation") as $file) {
+    AnnotationRegistry::registerFile($file->getPathName());
+}
 
 $app = new Application();
 
