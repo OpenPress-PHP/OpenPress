@@ -197,7 +197,7 @@ class Route
                 $group->setContainer(static::$app->getContainer());
 
                 $nestedGroup = static::$group;
-                $groupDefined;
+                $groupDefined = true;
             }
 
             if ($groupDefined && get_class($anno) === \OpenPress\Annotation\Middleware::class) {
