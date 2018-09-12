@@ -1,0 +1,8 @@
+{
+    "plugins": [
+        "openpress/core",
+        "openpress/login",
+        "openpress/whoops"
+    ],
+    "theme": "openpress/default"
+}

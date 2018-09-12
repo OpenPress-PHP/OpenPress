@@ -13,19 +13,18 @@ class Loader
     private static $plugins = [];
     private static $pluginsByPriority = [];
     private static $themes = [];
+    private static $bundles = [];
     private static $loaded;
 
     public function __construct(Application $app)
     {
         $this->app = $app;
+        $this->enabled = json_decode(file_get_contents(ROOT_DIR . "/app/enabled.json"), true);
 
         if (empty(static::$plugins)) {
-            $finder = (new Finder())->files()->in(__DIR__ . "/../../app/plugins/*/*")->name("composer.json");
+            $finder = (new Finder())->files()->in(ROOT_DIR . "/app/plugins/*/*")->name("composer.json");
             foreach ($finder as $file) {
                 $plugin = json_decode(file_get_contents($file->getPathName()), true);
-
-                $enabled = $plugin['extra']['openpress']['enabled'] ?? false;
-                unset($plugin['extra']['openpress']['enabled']);
 
                 $baseClass = $plugin['extra']['openpress']['class'] ?? null;
                 unset($plugin['extra']['openpress']['class']);
@@ -35,8 +34,8 @@ class Loader
 
                 $location = dirname(realpath($file->getPathName()));
 
-                if (!$enabled) {
-                    $baseClass = DisabledPlugin::class;
+                if (!isset($plugin['name'])) {
+                    throw new InvalidPluginException($location, "Missing name");
                 }
 
                 if ($baseClass === null) {
@@ -47,8 +46,10 @@ class Loader
                     throw new InvalidPluginException($location, "Plugin class must extend " . Plugin::class);
                 }
 
-                if (!isset($plugin['name'])) {
-                    throw new InvalidPluginException($location, "Missing name");
+                $enabled = in_array($plugin['name'], $this->enabled["plugins"]);
+
+                if (!$enabled) {
+                    $baseClass = DisabledPlugin::class;
                 }
 
                 $data = [
@@ -76,14 +77,14 @@ class Loader
             $finder = (new Finder())->files()->in(__DIR__ . "/../../app/themes/*/*")->name("composer.json");
             foreach ($finder as $file) {
                 $theme = json_decode(file_get_contents($file->getPathName()), true);
-                $enabled = $theme['extra']['openpress']['enabled'] ?? false;
-                unset($theme['extra']['openpress']['enabled']);
 
                 $location = dirname(realpath($file->getPathName()));
 
                 if (!isset($theme['name'])) {
                     throw new InvalidThemeException($location, "Missing name");
                 }
+
+                $enabled = ($this->enabled["theme"] ?? null) == $theme['name'];
 
                 $data = [
                     "name" => $theme['name'],
@@ -161,6 +162,46 @@ class Loader
     public function getSeedDirectories()
     {
         return $this->getDirectoriesFromEnabledPlugins("Seeds");
+    }
+
+    public function getBundles()
+    {
+        if (empty(static::$bundles)) {
+            $plugins = static::$pluginsByPriority;
+            ksort($plugins);
+
+            static::$bundles = [];
+
+            $filesystem = new Filesystem();
+            foreach ($plugins as $_ => $ps) {
+                foreach ($ps as $plugin) {
+                    foreach ($plugin->getBundles() as $name => $ls) {
+                        foreach ($ls as $location) {
+                            $root = $plugin->getLocation();
+
+                            if ($location[0] == "@") {
+                                if (substr($location, 0, 6) == "@node/") {
+                                    $root = ROOT_DIR . "/node_modules";
+                                    $location = substr($location, 5);
+                                } else {
+                                    $iplugin = implode("/", array_slice(explode("/", substr($location, 1)), 0, 2));
+                                    if ($eplugin = (Loader::getEnabledPlugins()[$iplugin] ?? false)) {
+                                        $root = $eplugin->getLocation();
+                                        $location = substr($location, strlen($iplugin) + 1);
+                                    }
+                                }
+                            }
+
+                            if ($filesystem->exists($root . $location)) {
+                                static::$bundles[$name][] = $root . $location;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return static::$bundles;
     }
 
     private function getDirectoriesFromEnabledPlugins($key)
