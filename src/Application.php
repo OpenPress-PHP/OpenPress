@@ -8,6 +8,7 @@ use OpenPress\Content\Loader;
 use Slim\Flash\Messages as Flash;
 use OpenPress\Config\Configuration;
 use Psr\Container\ContainerInterface;
+use OpenPress\Render\Twig\CsrfExtension;
 use OpenPress\Render\Twig\BundlerExtension;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -72,6 +73,8 @@ class Application extends App
                     $c->get('request')
                 ));
 
+                $twig->addExtension(new CsrfExtension($c->get("csrf")));
+
                 $twig->addExtension(new \Slim\Views\TwigExtension(
                     $c->get('router'),
                     $c->get('request')->getUri()
@@ -79,7 +82,7 @@ class Application extends App
 
                 return $twig;
             },
-            Csrf::class => function (ContainerInterface $c) {
+            "csrf" => function (ContainerInterface $c) {
                 return new Csrf();
             },
             Flash::class => function (ContainerInterface $c) {

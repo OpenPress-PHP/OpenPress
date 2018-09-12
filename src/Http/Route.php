@@ -192,7 +192,7 @@ class Route
         $classAnnos = $reader->getClassAnnotations($reflectionClass);
         foreach ($classAnnos as $anno) {
             if (get_class($anno) === \OpenPress\Annotation\RouteGroup::class) {
-                $group = static::$app->getContainer()->get('router')->pushGroup($anno->group, function ($group) {
+                $group = static::$app->getContainer()->get('router')->pushGroup($anno->group, function () {
                 });
                 $group->setContainer(static::$app->getContainer());
 
