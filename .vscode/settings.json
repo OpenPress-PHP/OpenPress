@@ -5,7 +5,9 @@
     "**/.hg": true,
     "**/CVS": true,
     "**/.DS_Store": true,
-    "**/public": true
+    "**/public": true,
+    "**/composer.lock": true,
+    "**/yarn.lock": true
   },
   "emeraldwalk.runonsave": {
     "commands": [
