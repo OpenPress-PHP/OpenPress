@@ -8,6 +8,7 @@ use OpenPress\Content\Loader;
 use Slim\Flash\Messages as Flash;
 use OpenPress\Config\Configuration;
 use Psr\Container\ContainerInterface;
+use OpenPress\Render\Twig\BundlerExtension;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -64,6 +65,12 @@ class Application extends App
                     'cache' => $cache,
                     'debug' => Configuration::get("debug", false)
                 ]);
+
+                $twig->addExtension(new BundlerExtension(
+                    $c->get('router'),
+                    $c->get(Loader::class),
+                    $c->get('request')
+                ));
 
                 $twig->addExtension(new \Slim\Views\TwigExtension(
                     $c->get('router'),

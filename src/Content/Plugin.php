@@ -4,6 +4,7 @@ namespace OpenPress\Content;
 use RuntimeException;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 abstract class Plugin
 {
@@ -105,6 +106,16 @@ abstract class Plugin
     public function getSeedsDirectory()
     {
         return $this->getDirectory("seeds", "resources/seeds");
+    }
+
+    public function getBundles()
+    {
+        $location = $this->getLocation() . "/bundle.json";
+        if ((new Filesystem())->exists($location)) {
+            return json_decode(file_get_contents($location), true);
+        }
+
+        return [];
     }
 
     private function getDirectory($key, $folder)
