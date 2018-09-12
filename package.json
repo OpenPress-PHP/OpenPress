@@ -1,0 +1,12 @@
+{
+  "name": "OpenPress",
+  "version": "1.0.0",
+  "main": "gulpfile.js",
+  "repository": "https://github.com/dominiccarrington/OpenPress.git",
+  "author": "Dominic Carrington <carringtondominic@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  }
+}
