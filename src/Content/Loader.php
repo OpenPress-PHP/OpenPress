@@ -5,6 +5,7 @@ use RuntimeException;
 use DI\ContainerBuilder;
 use OpenPress\Application;
 use Symfony\Component\Finder\Finder;
+use OpenPress\Validate\ValidatorSchema;
 use Symfony\Component\Filesystem\Filesystem;
 
 class Loader
@@ -115,6 +116,12 @@ class Loader
             foreach ($plugins as $plugin) {
                 $plugin->setContainer($this->app->getContainer());
                 $plugin->load();
+
+                foreach ($plugin->getJsonValidators() as $file) {
+                    $fileName = $file->getFileName();
+                    $filePath = $file->getPathName();
+                    ValidatorSchema::addJsonValidator($plugin, $fileName, $filePath);
+                }
             }
         }
     }
@@ -202,6 +209,21 @@ class Loader
         }
 
         return static::$bundles;
+    }
+
+    public function getLanguageFiles(string $locale)
+    {
+        $files = [];
+        foreach (static::$pluginsByPriority as $_ => $ps) {
+            foreach ($ps as $plugin) {
+                $file = $plugin->getLanguageFile($locale);
+                if ($file !== null) {
+                    $files[] = $file;
+                }
+            }
+        }
+
+        return $files;
     }
 
     private function getDirectoriesFromEnabledPlugins($key)

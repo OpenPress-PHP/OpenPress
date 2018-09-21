@@ -9,7 +9,9 @@ use Slim\Flash\Messages as Flash;
 use OpenPress\Config\Configuration;
 use Psr\Container\ContainerInterface;
 use OpenPress\Render\Twig\CsrfExtension;
+use OpenPress\Render\Twig\I18nExtension;
 use OpenPress\Render\Twig\BundlerExtension;
+use OpenPress\Render\Twig\ValidationExtension;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -67,6 +69,10 @@ class Application extends App
                     'debug' => Configuration::get("debug", false)
                 ]);
 
+                $twig->addExtension(new I18nExtension());
+
+                $twig->addExtension(new ValidationExtension($c->get(Flash::class)));
+
                 $twig->addExtension(new BundlerExtension(
                     $c->get('router'),
                     $c->get(Loader::class),
@@ -74,6 +80,7 @@ class Application extends App
                 ));
 
                 $twig->addExtension(new CsrfExtension($c->get("csrf")));
+
 
                 $twig->addExtension(new \Slim\Views\TwigExtension(
                     $c->get('router'),

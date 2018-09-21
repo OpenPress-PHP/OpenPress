@@ -3,6 +3,7 @@ namespace OpenPress\Content;
 
 use RuntimeException;
 use DI\ContainerBuilder;
+use Symfony\Component\Finder\Finder;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -116,6 +117,32 @@ abstract class Plugin
         }
 
         return [];
+    }
+
+    public function getLanguageFile(string $locale)
+    {
+        if (!$this->directoryExists("lang", "resources/lang")) {
+            return null;
+        }
+
+        $finder = (new Finder())->files()->in($this->getDirectory("lang", "resources/lang"))->name("$locale.lang")->getIterator();
+        $finder->rewind();
+
+        return file_get_contents($finder->current()->getPathname());
+    }
+
+    public function getJsonValidators()
+    {
+        if (!$this->directoryExists("validators", "resources/validators")) {
+            return [];
+        }
+
+        return (new Finder())->files()->in($this->getDirectory("validators", "resources/validators"))->name("/\.(json|yaml)$/");
+    }
+
+    private function directoryExists($key, $folder)
+    {
+        return (new Filesystem())->exists($this->getDirectory($key, $folder));
     }
 
     private function getDirectory($key, $folder)

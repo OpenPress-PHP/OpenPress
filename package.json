@@ -6,6 +6,10 @@
   "author": "Dominic Carrington <carringtondominic@gmail.com>",
   "license": "MIT",
   "private": true,
+  "dependencies": {
+    "@bower_components/zxcvbn": "dropbox/zxcvbn#^4.4.2",
+    "validator": "^10.7.1"
+  },
   "devDependencies": {
     "gulp": "^3.9.1"
   }
