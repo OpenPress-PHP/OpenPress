@@ -18,12 +18,12 @@ class AssetsController extends BaseController
             throw new InvalidArgumentException("{$bundle} does not exist with any bundle.json file.");
         }
 
-        $minifer = new JSMinifier();
-        foreach ($bundles as $bundle) {
-            $minifer->add($bundle);
+        $minifier = new JSMinifier();
+        foreach ($bundles[$bundle] as $bundle) {
+            $minifier->add($bundle);
         }
 
         $response->withHeader("Content-Type", "application/javascript");
-        return $response->getBody()->write($minifer->minify());
+        return $response->getBody()->write($minifier->minify());
     }
 }
